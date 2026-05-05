@@ -13,5 +13,5 @@
 ## Sprint 2 - Turmas e Aulas [RF04/RF05] (Inicio: 05/05/2026)
 
 - Fazer o diagrama de sequência do sistema de Turmas e Aulas
-- Fazer o diagrama de componentes desse sistema isolado
+- Fazer o diagrama de componentes desse sistema isolado (foi feito o RF08 junto no diagrama para facilitar o entendimento)
 - 

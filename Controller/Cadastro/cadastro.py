@@ -5,7 +5,7 @@ import os
 from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
-CORS(app)  # Permite requisições de outras origens
+CORS(app)
 
 # Caminho do arquivo users.json
 USERS_FILE = os.path.join(os.path.dirname(__file__), '../../database/users.json')
@@ -66,7 +66,8 @@ def cadastro():
             'email': email,
             'tipo': 'aluno',  #sempre "aluno" para auto-cadastro
             'senha': generate_password_hash(senha),
-            'notas': []
+            'notas': [],
+            'turmas': []
         }
         
         #adiciona o novo usuário na lista
