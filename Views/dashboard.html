@@ -252,19 +252,17 @@
                 </div>
             </div>
 
-            <div class="page" id="turmas">
-                <div class="card">
-                    <h2>Cadastre Turmas</h2>
-            <form id="entrada-turma">
-                <div class="form-group">
-                <label for="entrada-turma">Número da Turma</label>
-                <input type="text" id="entrada-turma" name="entrada-turma" required>
-                <button>Entrar</button>
-            </form>
+        <div class="page" id="turmas">
+            <div class="card">
+                <h2>Cadastre Turmas</h2>
+                <form id="entrada-turma">        <!-- form abre aqui -->
+                    <div class="form-group">
+                    <label for="entrada-turma">Número da Turma</label>
+                    <input type="text" id="entrada-turma" ...>
+                    <button>Entrar</button>
+                </form>                          <!-- mas o div.form-group nunca fecha -->
+            </div>                               <!-- e esse div.card fecha antes do form -->
             </div>
-                </div>
-            </div>
-
 
 
 
@@ -287,7 +285,7 @@
                 </div>
             </div>
 
-            <div class="page" id="frequência">
+            <div class="page" id="frequencia">
                 <h2>Frequência</h2>
                 <div class="card">
                     <h2>Frequência dos Alunos</h2>
