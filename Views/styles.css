@@ -1,0 +1,243 @@
+/* ==================== RESET E ESTILOS GLOBAIS ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #2d1b4e;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ==================== CONTAINERS ==================== */
+
+.container {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Estilo específico para a página inicial */
+.container-inicial {
+    max-width: 500px;
+    text-align: center;
+}
+
+/* ==================== TÍTULOS ==================== */
+
+h1 {
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2em;
+}
+
+h1.titulo-inicial {
+    font-size: 2.5em;
+}
+
+/* ==================== PARÁGRAFOS ==================== */
+
+p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+/* ==================== FORMULÁRIOS ==================== */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.3s;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+    transition: border-color 0.3s;
+    background-color: white;
+    cursor: pointer;
+}
+
+select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+}
+
+input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+}
+
+/* Input de login com cor diferente */
+#formulario-login input:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 5px rgba(118, 75, 162, 0.5);
+}
+
+/* ==================== BOTÕES ==================== */
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #667eea;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #5568d3;
+}
+
+/* Botão de login com cor diferente */
+#formulario-login button {
+    background-color: #764ba2;
+}
+
+#formulario-login button:hover {
+    background-color: #63408b;
+}
+
+/* ==================== BOTÕES NA PÁGINA INICIAL ==================== */
+
+.botoes {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+a {
+    padding: 15px 40px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    font-weight: bold;
+}
+
+.btn-cadastro {
+    background-color: #667eea;
+    color: white;
+}
+
+.btn-cadastro:hover {
+    background-color: #5568d3;
+}
+
+.btn-login {
+    background-color: #764ba2;
+    color: white;
+}
+
+.btn-login:hover {
+    background-color: #63408b;
+}
+
+/* Botão de voltar */
+.btn-voltar {
+    display: block;
+    margin-top: 15px;
+    text-align: center;
+    color: #667eea;
+    background-color: transparent;
+    padding: 0;
+    font-size: 1em;
+}
+
+.btn-voltar:hover {
+    background-color: transparent;
+    text-decoration: underline;
+}
+
+#formulario-login ~ a.btn-voltar {
+    color: #764ba2;
+}
+
+/* ==================== MENSAGENS ==================== */
+
+.mensagem {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 5px;
+    text-align: center;
+    display: none;
+    font-weight: bold;
+}
+
+.mensagem.erro {
+    background-color: #f8d7da;
+    color: #721c24;
+    display: block;
+}
+
+.mensagem.sucesso {
+    background-color: #d4edda;
+    color: #155724;
+    display: block;
+}
+
+/* ==================== RESPONSIVO ==================== */
+
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 20px;
+        max-width: 100%;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+    }
+    
+    h1.titulo-inicial {
+        font-size: 2em;
+    }
+    
+    .botoes {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    a {
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+}

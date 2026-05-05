@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AVA</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <p>Credenciais de teste: Alison / 123456</p>
+        <p>Credenciais de teste professor: Professor / 1234</p>
+        <form id="formulario-login">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required>
+            </div>
+            
+            <button type="submit">Entrar</button>
+        </form>
+        
+        <div id="mensagem" class="mensagem"></div>
+        
+        <a href="/" class="btn-voltar">← Voltar</a>
+    </div>
+    
+    <script>
+        // Quando o formulário é enviado
+        document.getElementById('formulario-login').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const nome = document.getElementById('nome').value;
+            const senha = document.getElementById('senha').value;
+            
+            // Envia para o gateway (porta 5000)
+            fetch('http://localhost:5000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome: nome,
+                    senha: senha
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const mensagemDiv = document.getElementById('mensagem');
+                
+                if (data.error) {
+                    mensagemDiv.textContent = data.error;
+                    mensagemDiv.className = 'mensagem erro';
+                } else {
+                    // Guarda os dados do usuário no localStorage
+                    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+                    
+                    mensagemDiv.textContent = data.message;
+                    mensagemDiv.className = 'mensagem sucesso';
+                    // Redireciona após 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                document.getElementById('mensagem').textContent = 'Erro ao conectar com o servidor';
+                document.getElementById('mensagem').className = 'mensagem erro';
+            });
+        });
+    </script>
+</body>
+</html>

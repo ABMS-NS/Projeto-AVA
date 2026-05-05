@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - AVA</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Cadastro</h1>
+        
+        <form id="formulario-cadastro">
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha" required>
+            </div>
+            
+            <button type="submit">Cadastrar</button>
+        </form>
+        
+        <div id="mensagem" class="mensagem"></div>
+        
+        <a href="/" class="btn-voltar">← Voltar</a>
+    </div>
+    
+    <script>
+        // Quando o formulário é enviado, essa função é chamada
+        document.getElementById('formulario-cadastro').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita o reload da página
+            
+            // Pega os valores das caixinhas
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            
+            // Envia os dados para o gateway (porta 5000)
+            fetch('http://localhost:5000/api/cadastro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome: nome,
+                    email: email,
+                    senha: senha
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const mensagemDiv = document.getElementById('mensagem');
+                
+                if (data.error) {
+                    mensagemDiv.textContent = data.error;
+                    mensagemDiv.className = 'mensagem erro';
+                } else {
+                    mensagemDiv.textContent = data.message;
+                    mensagemDiv.className = 'mensagem sucesso';
+                    // Limpa o formulário
+                    document.getElementById('formulario-cadastro').reset();
+                    // Redireciona para login após 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/login_form';
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                document.getElementById('mensagem').textContent = 'Erro ao conectar com o servidor';
+                document.getElementById('mensagem').className = 'mensagem erro';
+            });
+        });
+    </script>
+</body>
+</html>

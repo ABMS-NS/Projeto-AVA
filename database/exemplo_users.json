@@ -1,0 +1,17 @@
+[
+  {
+    "nome": "João Silva",
+    "email": "joao@email.com",
+    "tipo": "aluno",
+    "senha": "pbkdf2:sha256:...",
+    "notas": []
+  },
+  {
+    "nome": "Prof. Maria",
+    "email": "maria@email.com",
+    "tipo": "professor",
+    "senha": "pbkdf2:sha256:...",
+    "turmas": [],
+    "alunos": []
+  }
+]

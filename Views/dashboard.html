@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AVA</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2d1b4e;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            left: 0;
+            top: 0;
+            transition: left 0.3s;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.ativo {
+            left: 0;
+        }
+
+        .sidebar-logo {
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.8em;
+            font-weight: bold;
+            border-bottom: 2px solid #667eea;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin: 0;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(102, 126, 234, 0.2);
+            color: white;
+            border-left-color: #667eea;
+        }
+
+        .sidebar-menu a.ativo {
+            background: rgba(102, 126, 234, 0.3);
+            color: white;
+            border-left-color: #667eea;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 0;
+        }
+
+        .header-top {
+            background: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-top h1 {
+            margin: 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .header-top .usuario-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-top .btn-logout {
+            background-color: #e74c3c;
+            padding: 8px 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .header-top .btn-logout:hover {
+            background-color: #c0392b;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.ativo {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .card h2 {
+            color: #333;
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        .card p {
+            color: #666;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -280px;
+            }
+
+            .sidebar.ativo {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header-top {
+                flex-wrap: wrap;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-logo">AVA</div>
+        
+        <!-- Menu Alunos -->
+        <ul class="sidebar-menu" id="menu-aluno" style="display: none;">
+            <li><a class="menu-item ativo" data-page="inicio-aluno">Início</a></li>
+            <li><a class="menu-item" data-page="notas">Minhas Notas</a></li>
+            <li><a class="menu-item" data-page="turmas">Turmas</a></li>
+        </ul>
+
+        <!-- Menu Professores -->
+        <ul class="sidebar-menu" id="menu-professor" style="display: none;">
+            <li><a class="menu-item ativo" data-page="inicio-professor">Início</a></li>
+            <li><a class="menu-item" data-page="turmas_prof">Turmas</a></li>
+            <li><a class="menu-item" data-page="frequencia">Frequência</a></li>
+        </ul>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+        <!-- HEADER TOP -->
+        <div class="header-top">
+            <button class="menu-toggle" id="menu-toggle">☰ Menu</button>
+            <h1 id="page-title">Dashboard</h1>
+            <div class="usuario-info">
+                <span id="nome-usuario">Usuário</span>
+                <a href="/" class="btn-logout">Sair</a>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO -->
+        <div class="content-area">
+            <!-- PÁGINAS ALUNO -->
+            <div class="page ativo" id="inicio-aluno">
+                <h2>Bem-vindo ao AVA!</h2>
+                <div class="grid">
+                    <div class = card>
+                        <h2>Olá!</h2>
+                        <p>No futuro teremos algo aqui
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="notas">
+                <h2>Minhas Notas</h2>
+                <div class="card">
+                    <h2>Notas</h2>
+                    <p>Sem notas ainda</p>
+                </div>
+            </div>
+
+            <div class="page" id="turmas">
+                <div class="card">
+                    <h2>Cadastre Turmas</h2>
+            <form id="entrada-turma">
+                <div class="form-group">
+                <label for="entrada-turma">Número da Turma</label>
+                <input type="text" id="entrada-turma" name="entrada-turma" required>
+                <button>Entrar</button>
+            </form>
+            </div>
+                </div>
+            </div>
+
+
+
+
+            <!-- PÁGINAS PROFESSOR -->
+            <div class="page" id="inicio-professor">
+                <h2>Bem-vindo, Professor!</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h2>Olá, Professor!</h2>
+                        <p>No futuro teremos algo aqui</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page" id="turmas_prof">
+                <h2>Minhas Turmas</h2>
+                <div class="card">
+                    <h2>Turmas Ativas</h2>
+                    <p>Você não tem turmas cadastradas ainda. Crie uma nova turma!</p>
+                </div>
+            </div>
+
+            <div class="page" id="frequência">
+                <h2>Frequência</h2>
+                <div class="card">
+                    <h2>Frequência dos Alunos</h2>
+                    <p>Monitore a frequência dos seus alunos.</p>
+                </div>
+            </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar se usuário está logado
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+        if (!usuario) {
+            window.location.href = '/login_form';
+        } else {
+            document.getElementById('nome-usuario').textContent = usuario.nome;
+
+            // Mostrar menu correto
+            if (usuario.tipo === 'aluno') {
+                document.getElementById('menu-aluno').style.display = 'block';
+            } else if (usuario.tipo === 'professor') {
+                document.getElementById('menu-professor').style.display = 'block';
+            }
+        }
+
+        // Navegação do menu
+        const menuItems = document.querySelectorAll('.menu-item');
+        const pages = document.querySelectorAll('.page');
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menu-toggle');
+        const pageTitle = document.getElementById('page-title');
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const pageId = this.getAttribute('data-page');
+
+                // Remove ativo de todos
+                menuItems.forEach(m => m.classList.remove('ativo'));
+                pages.forEach(p => p.classList.remove('ativo'));
+
+                // Adiciona ativo ao clicado
+                this.classList.add('ativo');
+                document.getElementById(pageId).classList.add('ativo');
+
+                // Atualiza título
+                pageTitle.textContent = this.textContent;
+
+                // Fecha sidebar em mobile
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('ativo');
+                }
+            });
+        });
+
+        // Toggle menu em mobile
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('ativo');
+        });
+
+        // Fechar sidebar ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                if (!e.target.closest('.sidebar') && !e.target.closest('.menu-toggle')) {
+                    sidebar.classList.remove('ativo');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
