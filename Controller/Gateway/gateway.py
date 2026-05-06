@@ -9,6 +9,7 @@ CORS(app)
 # URLs dos microsserviços
 CADASTRO_SERVICE = 'http://localhost:5001'
 LOGIN_SERVICE = 'http://localhost:5002'
+CLASSES_SERVICE = 'http://localhost:5003'
 
 # ==================== ROTAS DE PÁGINA ====================
 
@@ -125,6 +126,31 @@ def api_login():
         return jsonify({'error': 'Serviço de login indisponível'}), 503
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/registro_turma')
+def api_registro_turma():
+    """API para registrar turma via JSON"""
+
+    try:
+        data = request.get_json()
+        response = request.post(
+            f'{CLASSES_SERVICE}/registro_turma',
+            json = data,
+            timeout=5
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.ConnectionError:
+        return jsonify({'error': 'Serviço de turma indisponível'}), 503
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

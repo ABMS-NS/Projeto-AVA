@@ -10,7 +10,7 @@
     - implementação do login.py e do cadastro.py
 - teste unitário dos mesmos![alt text](image.png)
 
-## Sprint 2 - Turmas e Aulas [RF04/RF05] (Inicio: 05/05/2026)
+## Sprint 2 - Turmas e Aulas [RF04/RF05/RF07] (Inicio: 05/05/2026)
 
 - Fazer o diagrama de sequência do sistema de Turmas e Aulas
 - Fazer o diagrama de componentes desse sistema isolado (foi feito o RF07 junto no diagrama para facilitar o entendimento)

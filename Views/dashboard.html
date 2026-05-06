@@ -260,8 +260,9 @@
                     <label for="entrada-turma">Número da Turma</label>
                     <input type="text" id="entrada-turma" ...>
                     <button>Entrar</button>
-                </form>                          <!-- mas o div.form-group nunca fecha -->
-            </div>                               <!-- e esse div.card fecha antes do form -->
+                    </div>  //corrigido mds do céu
+                </form>                          
+            </div>                              
             </div>
 
 
@@ -277,13 +278,70 @@
                 </div>
             </div>
 
+
+            <!--   
+            
+            
+            Turmas do professor
+            
+            
+            -->
             <div class="page" id="turmas_prof">
                 <h2>Minhas Turmas</h2>
                 <div class="card">
-                    <h2>Turmas Ativas</h2>
-                    <p>Você não tem turmas cadastradas ainda. Crie uma nova turma!</p>
+                    <h2>Criar Turmas</h2>
+                    <form id= "nome-turma">
+                        <label for="nome-tuma">Nome da Turma</label>
+                        <input type="text" id="nome-turma" ...>
+                        <button id="criar-turma">Criar</button>
+                    </form>
                 </div>
             </div>
+
+            <script>
+            document.getElementById('nome-turma').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita o reload da página
+            
+            // Pega os valores das caixinhas
+            const nome_turma = document.getElementById('nome-turma').value;
+            
+            // Envia os dados para o gateway (porta 5000)
+            fetch('http://localhost:5000/api/registro_turma', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome_turma: nome_turma
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Aqui você pode adicionar mais lógica, como exibir uma mensagem de sucesso
+                alert('Turma registrada com sucesso!');
+            })
+            .catch(error => {
+                // Aqui você pode adicionar mais lógica, como exibir uma mensagem de erro
+                alert('Erro ao registrar turma.');
+            })
+            .finally(() => {
+                // Recarrega a página após o fetch
+                location.reload();
+            });
+        });
+
+            </script>
+
+
+
+
+            <!--   
+            
+            
+            frequencia das aulas
+            
+            
+            -->
 
             <div class="page" id="frequencia">
                 <h2>Frequência</h2>
