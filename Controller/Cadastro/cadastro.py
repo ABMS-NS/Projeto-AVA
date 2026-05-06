@@ -22,8 +22,8 @@ def load_users():
 
 def save_users(users):
     """Salva os usuários no arquivo JSON"""
-    os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
-    with open(USERS_FILE, 'w', encoding='utf-8') as f:
+    os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True) #se o json existe
+    with open(USERS_FILE, 'w', encoding='utf-8') as f: #abre ele e lê 
         json.dump(users, f, indent=2, ensure_ascii=False)
 
 # ======== ROTAS PARA PROCESSAR DADOS ========
@@ -31,21 +31,24 @@ def save_users(users):
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     try:
-        # Tenta receber JSON primeiro (para requisições via JavaScript/Fetch)
+        # tenta receber JSON primeiro
         data = request.get_json(silent=True)
-        
-        # Se não houver JSON, tenta receber dados do formulário HTML
+
+        # se for JSON, mas vazio, tenta pegar do form
         if not data:
             data = request.form.to_dict()
         
-        #validação dos dados
+        #se ainda ss tiver erro, printa erro
         if not data:
             return jsonify({'error': 'Nenhum dado foi enviado'}), 400
         
+        #tratamento de entrada caso use espaço no final ou no começo
         nome = data.get('nome', '').strip()
         email = data.get('email', '').strip()
         senha = data.get('senha', '').strip()
         
+        
+        #caso esteja faltando algo
         if not nome or not email or not senha:
             return jsonify({'error': 'Nome, email e senha são obrigatórios'}), 400
         

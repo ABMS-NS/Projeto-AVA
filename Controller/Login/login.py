@@ -32,11 +32,11 @@ def login():
         if not data:
             return jsonify({'error': 'Nenhum dado foi enviado'}), 400
         
-        nome = data.get('nome', '').strip()
+        email = data.get('email', '').strip()
         senha = data.get('senha', '').strip()
         
-        if not nome or not senha:
-            return jsonify({'error': 'Nome e senha são obrigatórios'}), 400
+        if not email or not senha:
+            return jsonify({'error': 'Email e senha são obrigatórios'}), 400
         
         # Carrega usuários do arquivo
         users = load_users()
@@ -44,7 +44,7 @@ def login():
         # Procura o usuário pelo nome
         usuario = None
         for user in users:
-            if user['nome'] == nome:
+            if user['email'] == email:
                 usuario = user
                 break
         

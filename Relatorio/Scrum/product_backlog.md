@@ -7,6 +7,6 @@ Alta: [RF01/RF02] Autenticação e Cadastro (Base para tudo).
 
 Alta: [RF04/RF05] Gestão de Turmas e Sessões (Núcleo do sistema).
 
-Média: [RF08] Timer de aula e chamada automática.
+Média: [RF07] Timer de aula e chamada automática.
 
 Média: [RF03/RF06] Sistema de Notas.
