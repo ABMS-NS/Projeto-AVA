@@ -69,5 +69,18 @@ def registro_turma():
     except Exception as e:
         return jsonify({'error': f'Erro no servidor: {str(e)}'}), 500
 
+@app.route('/listar_turmas', methods=['GET'])
+def listar_turmas():
+    try:
+        if os.path.exists(CLASS_FILE):
+            with open(CLASS_FILE, 'r', encoding='utf-8') as f:
+                classes = json.load(f)
+        else:
+            classes = []
+        return jsonify(classes), 200
+    except Exception as e:
+        return jsonify({'error': f'Erro ao listar turmas: {str(e)}'}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5003)

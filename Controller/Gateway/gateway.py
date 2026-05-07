@@ -146,7 +146,16 @@ def api_registro_turma():
         
 
 
-
+@app.route('/api/listar_turmas', methods=['GET'])
+def api_listar_turmas():
+    """API para listar turmas já registradadas no sistema para o professor (NÃO TESTADA AINDA)"""
+    try:
+        response = requests.get(f'{CLASSES_SERVICE}/listar_turmas', timeout=5)
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.ConnectionError:
+        return jsonify({'error': 'Serviço de turma indisponível'}), 503
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 

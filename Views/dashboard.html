@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -198,11 +199,12 @@
         }
     </style>
 </head>
+
 <body>
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-logo">AVA</div>
-        
+
         <!-- Menu Alunos -->
         <ul class="sidebar-menu" id="menu-aluno" style="display: none;">
             <li><a class="menu-item ativo" data-page="inicio-aluno">Início</a></li>
@@ -236,7 +238,7 @@
             <div class="page ativo" id="inicio-aluno">
                 <h2>Bem-vindo ao AVA!</h2>
                 <div class="grid">
-                    <div class = card>
+                    <div class=card>
                         <h2>Olá!</h2>
                         <p>No futuro teremos algo aqui
                         </p>
@@ -252,17 +254,17 @@
                 </div>
             </div>
 
-        <div class="page" id="turmas">
-            <div class="card">
-                <h2>Cadastre Turmas</h2>
-                <form id="entrada-turma">        <!-- form abre aqui -->
-                    <div class="form-group">
-                    <label for="entrada-turma">Número da Turma</label>
-                    <input type="text" id="entrada-turma" ...>
-                    <button>Entrar</button>
-                    </div>
-                </form>                          
-            </div>                              
+            <div class="page" id="turmas">
+                <div class="card">
+                    <h2>Cadastre Turmas</h2>
+                    <form id="entrada-turma"> <!-- form abre aqui -->
+                        <div class="form-group">
+                            <label for="entrada-turma">Número da Turma</label>
+                            <input type="text" id="entrada-turma" ...>
+                            <button>Entrar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
 
@@ -292,53 +294,78 @@
                     <h2>Criar Turmas</h2>
                     <form id="form-criar-turma">
                         <label for="input-nome-tuma">Nome da Turma</label>
-                        <input type="text" id="input-nome-turma" name="nome_turma" placeholder="Ex: Turma de Engenharia de Software">
+                        <input type="text" id="input-nome-turma" name="nome_turma"
+                            placeholder="Ex: Turma de Engenharia de Software">
                         <button id="criar-turma">Criar</button>
                     </form>
+                </div>
+                <div class="card">
+                    <h2>Turmas Cadastradas</h2>
+                    <ul id="turmas-lista"></ul>
                 </div>
             </div>
 
             <script>
-            document.getElementById('form-criar-turma').addEventListener('submit', function(event) {
-                event.preventDefault(); // Evita o reload da página
-                
-                // Pega o valor do campo de entrada correto
-                const nome_turma = document.getElementById('input-nome-turma').value;
-                // Recupera os dados do professor logado
-                const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
+                document.getElementById('form-criar-turma').addEventListener('submit', function (event) {
+                    event.preventDefault(); // Evita o reload da página
 
-            // Envia os dados para o gateway (porta 5000)
-            fetch('http://localhost:5000/api/registro_turma', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    nome_turma: nome_turma,
-                    professor_email: usuarioLogado ? usuarioLogado.email : 'desconhecido'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Aqui você pode adicionar mais lógica, como exibir uma mensagem de sucesso
-                alert(data.message || 'Turma registrada com sucesso!');
-            })
-            .catch(error => {
-                // Aqui você pode adicionar mais lógica, como exibir uma mensagem de erro
-                alert('Erro ao registrar turma: ' + error.message);
-            })
-            .finally(() => {
-                // Recarrega a página após o fetch (opcional, pode ser substituído por feedback visual)
-                location.reload(); 
-            });
-        });
+                    // Pega o valor do campo de entrada correto
+                    const nome_turma = document.getElementById('input-nome-turma').value;
+                    // Recupera os dados do professor logado
+                    const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
 
-            </script>
+                    // Envia os dados para o gateway (porta 5000)
+                    fetch('http://localhost:5000/api/registro_turma', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            nome_turma: nome_turma,
+                            professor_email: usuarioLogado ? usuarioLogado.email : 'desconhecido'
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message || 'Turma registrada com sucesso!');
+                            // Atualiza a lista de turmas após criar
+                            fetchTurmas();
+                        })
+                        .catch(error => {
+                            // Aqui você pode adicionar mais lógica, como exibir uma mensagem de erro
+                            alert('Erro ao registrar turma: ' + error.message);
+                        })
+                        .finally(() => {
+                            // Recarrega a página após o fetch (opcional, pode ser substituído por feedback visual)
+                            // location.reload(); 
+                        });
+                });
 
+                // Função para buscar e listar turmas
+                function fetchTurmas() {
+                    fetch('http://localhost:5000/api/listar_turmas')
+                        .then(response => response.json())
+                        .then(turmas => {
+                            const lista = document.getElementById('turmas-lista');
+                            lista.innerHTML = '';
+                            if (Array.isArray(turmas) && turmas.length > 0) {
+                                turmas.forEach(t => {
+                                    const li = document.createElement('li');
+                                    li.textContent = `ID ${t.id}: ${t.nome_turma}`;
+                                    lista.appendChild(li);
+                                });
+                            } else {
+                                lista.innerHTML = '<li>Nenhuma turma cadastrada.</li>';
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Erro ao listar turmas:', err);
+                        });
+                }
 
-
-
-            <!--   
+                // Busca turmas ao carregar a página
+                document.addEventListener('DOMContentLoaded', fetchTurmas);
+            </script> <!--   
             
             
             frequencia das aulas
@@ -354,8 +381,8 @@
                 </div>
             </div>
 
-                </div>
-            </div>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -383,7 +410,7 @@
         const pageTitle = document.getElementById('page-title');
 
         menuItems.forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 const pageId = this.getAttribute('data-page');
 
                 // Remove ativo de todos
@@ -405,12 +432,12 @@
         });
 
         // Toggle menu em mobile
-        menuToggle.addEventListener('click', function() {
+        menuToggle.addEventListener('click', function () {
             sidebar.classList.toggle('ativo');
         });
 
         // Fechar sidebar ao clicar fora
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (window.innerWidth <= 768) {
                 if (!e.target.closest('.sidebar') && !e.target.closest('.menu-toggle')) {
                     sidebar.classList.remove('ativo');
@@ -419,4 +446,5 @@
         });
     </script>
 </body>
+
 </html>
