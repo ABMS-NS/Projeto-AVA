@@ -256,14 +256,18 @@
 
             <div class="page" id="turmas">
                 <div class="card">
-                    <h2>Cadastre Turmas</h2>
-                    <form id="entrada-turma"> <!-- form abre aqui -->
+                    <h2>Entrar em Turma</h2>
+                    <form id="form-entrar-turma">
                         <div class="form-group">
-                            <label for="entrada-turma">Número da Turma</label>
-                            <input type="text" id="entrada-turma" ...>
-                            <button>Entrar</button>
+                            <label for="input-id-turma">ID da Turma</label>
+                            <input type="text" id="input-id-turma" placeholder="Digite o ID da turma" />
                         </div>
+                        <button type="submit">Entrar</button>
                     </form>
+                </div>
+                <div class="card">
+                    <h2>Minhas Turmas</h2>
+                    <ul id="lista-minhas-turmas"></ul>
                 </div>
             </div>
 
@@ -444,6 +448,46 @@
                 }
             }
         });
+
+        // Turma entry handling
+        const formEntrar = document.getElementById('form-entrar-turma');
+        formEntrar.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const turmaId = document.getElementById('input-id-turma').value.trim();
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuario) { alert('Usuário não logado'); return; }
+            fetch('http://localhost:5000/api/adicionar_aluno_turma', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: usuario.email, id_turma: turmaId })
+            })
+                .then(r => r.json())
+                .then(data => { alert(data.message || data.error); fetchMinhasTurmas(); })
+                .catch(err => console.error(err));
+        });
+
+        function fetchMinhasTurmas() {
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            fetch('http://localhost:5000/api/listar_turmas')
+                .then(r => r.json())
+                .then(turmas => {
+                    const lista = document.getElementById('lista-minhas-turmas');
+                    lista.innerHTML = '';
+                    turmas.filter(t => t.alunos && t.alunos.includes(usuario.email)).forEach(t => {
+                        const li = document.createElement('li');
+                        li.textContent = `ID ${t.id}: ${t.nome_turma}`;
+                        const btn = document.createElement('button');
+                        btn.textContent = 'Entrar';
+                        btn.addEventListener('click', () => { window.location.href = '/turma.html?id=' + t.id; });
+                        li.appendChild(btn);
+                        lista.appendChild(li);
+                    });
+                })
+                .catch(err => console.error(err));
+        }
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', fetchMinhasTurmas);
+
     </script>
 </body>
 

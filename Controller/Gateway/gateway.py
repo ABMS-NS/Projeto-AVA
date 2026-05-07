@@ -23,6 +23,12 @@ def dashboard():
     """Mostra o dashboard do usuário logado"""
     return render_template('dashboard.html')
 
+@app.route('/turma.html', methods=['GET'])
+@app.route('/turma', methods=['GET'])
+def turma_view():
+    """Mostra os detalhes de uma turma específica"""
+    return render_template('turma.html')
+
 # ==================== CADASTRO ====================
 
 @app.route('/cadastro', methods=['GET', 'POST'])
@@ -160,6 +166,22 @@ def api_listar_turmas():
 
 
 
+
+@app.route('/api/adicionar_aluno_turma', methods=['POST'])
+def api_adicionar_aluno_turma():
+    """API para adicionar aluno a uma turma via JSON"""
+    try:
+        data = request.get_json()
+        response = requests.post(
+            f'{CLASSES_SERVICE}/adicionar_aluno_turma',
+            json=data,
+            timeout=5
+        )
+        return jsonify(response.json()), response.status_code
+    except requests.exceptions.ConnectionError:
+        return jsonify({'error': 'Serviço de turma indisponível'}), 503
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

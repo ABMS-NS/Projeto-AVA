@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turmas - AVA</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background: #667eea;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #556fd1;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="max-width:600px;margin:40px auto;">
+        <div class="card">
+            <h2>Entrar em Turma</h2>
+            <form id="form-entrar-turma">
+                <div class="form-group">
+                    <label for="input-id-turma">ID da Turma</label>
+                    <input type="text" id="input-id-turma" placeholder="Digite o ID da turma" required>
+                </div>
+                <button type="submit">Entrar</button>
+            </form>
+        </div>
+        <div class="card">
+            <h2>Minhas Turmas</h2>
+            <ul id="lista-minhas-turmas">
+                <!-- preenchido dinamicamente -->
+            </ul>
+        </div>
+    </div>
+    <script>
+        // Função genérica para chamar a API do backend (gateway roda na porta 5003)
+        const API_BASE = 'http://localhost:5003';
+
+        // Envio do formulário de entrada de ID
+        document.getElementById('form-entrar-turma').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const idTurma = document.getElementById('input-id-turma').value.trim();
+            const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
+            const payload = { id_turma: idTurma, email: usuario.email };
+            fetch(`${API_BASE}/adicionar_aluno_turma`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json())
+                .then(data => {
+                    alert(data.message || data.error || 'Operação concluída');
+                    fetchTurmas();
+                })
+                .catch(err => alert('Erro ao entrar na turma: ' + err.message));
+        });
+
+        // Recupera todas as turmas e lista as que o aluno já faz parte
+        function fetchTurmas() {
+            fetch(`${API_BASE}/listar_turmas`)
+                .then(r => r.json())
+                .then(turmas => {
+                    const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
+                    const lista = document.getElementById('lista-minhas-turmas');
+                    lista.innerHTML = '';
+                    turmas.forEach(t => {
+                        const li = document.createElement('li');
+                        li.textContent = `ID ${t.id}: ${t.nome_turma}`;
+                        const btn = document.createElement('button');
+                        btn.textContent = 'Entrar';
+                        btn.onclick = () => entrarTurma(t.id);
+                        li.appendChild(btn);
+                        lista.appendChild(li);
+                    });
+                })
+                .catch(err => console.error('Erro ao listar turmas', err));
+        }
+
+        function entrarTurma(id) {
+            const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
+            const payload = { id_turma: id, email: usuario.email };
+            fetch(`${API_BASE}/adicionar_aluno_turma`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json())
+                .then(data => alert(data.message || data.error || 'Operação concluída'))
+                .catch(err => alert('Erro ao entrar na turma: ' + err.message));
+        }
+
+        // Carrega as turmas ao abrir a página
+        document.addEventListener('DOMContentLoaded', fetchTurmas);
+    </script>
+</body>
+
+</html>

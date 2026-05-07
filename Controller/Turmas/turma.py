@@ -82,5 +82,47 @@ def listar_turmas():
         return jsonify({'error': f'Erro ao listar turmas: {str(e)}'}), 500
 
 
+@app.route('/adicionar_aluno_turma', methods=['POST'])
+def adicionar_aluno_turma():
+    try:
+        data = request.get_json(silent=True)
+        if not data:
+            data = request.form.to_dict()
+
+        if not data:
+            return jsonify({'error': 'Nenhum dado foi enviado'}), 400
+
+        email = data.get('email', '').strip()
+        id_turma = data.get('id_turma', '').strip()
+
+        if not email or not id_turma:
+            return jsonify({'error': 'id da turma é obrigatório'}), 400
+
+        if os.path.exists(CLASS_FILE):
+            with open(CLASS_FILE, 'r', encoding='utf-8') as f:
+                classes = json.load(f)
+
+        else:
+            classes = []
+
+        for turma in classes:
+            if turma['id'] == int(id_turma):
+
+                if email in turma['alunos']:
+                    return jsonify({'error': 'Aluno já cadastrado na turma'}), 400
+
+                turma['alunos'].append(email)
+                save_classes(classes)
+                return jsonify({'message': 'Aluno adicionado à turma'}), 200
+    
+        return jsonify({'error': 'Turma não encontrada'}), 404
+        
+    except Exception as e:
+        return jsonify({'error': f'Erro ao adicionar aluno à turma: {str(e)}'}), 500
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5003)
