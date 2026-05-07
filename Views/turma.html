@@ -4,139 +4,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turmas - AVA</title>
+    <title>Detalhes da Turma - AVA</title>
     <link rel="stylesheet" href="/static/styles.css">
     <style>
-        .card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background: #667eea;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #556fd1;
-        }
-
-        ul {
-            list-style: none;
+        body {
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 0;
+            display: block;
+            /* Override default body flex from styles.css */
+            min-height: 100vh;
         }
 
-        li {
-            margin-bottom: 10px;
+        .header-top {
+            background: #2d1b4e;
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-top h1 {
+            margin: 0;
+            color: white;
+            font-size: 1.5em;
+            text-align: left;
+        }
+
+        .btn-voltar {
+            background-color: #667eea;
+            padding: 8px 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            margin: 0;
+            width: auto;
+        }
+
+        .btn-voltar:hover {
+            background-color: #556fd1;
+        }
+
+        .content-area {
+            padding: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .card h2 {
+            color: #333;
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .participant-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .participant-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .participant-item:last-child {
+            border-bottom: none;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .email {
+            font-size: 1em;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .role {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .loading,
+        .error-msg {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .error-msg {
+            color: #e74c3c;
         }
     </style>
 </head>
 
 <body>
-    <div class="container" style="max-width:600px;margin:40px auto;">
+    <div class="header-top">
+        <h1 id="turma-titulo">Carregando Turma...</h1>
+        <a href="/dashboard" class="btn-voltar">Voltar</a>
+    </div>
+
+    <div class="content-area" id="conteudo-turma" style="display: none;">
         <div class="card">
-            <h2>Entrar em Turma</h2>
-            <form id="form-entrar-turma">
-                <div class="form-group">
-                    <label for="input-id-turma">ID da Turma</label>
-                    <input type="text" id="input-id-turma" placeholder="Digite o ID da turma" required>
-                </div>
-                <button type="submit">Entrar</button>
-            </form>
+            <h2>Alunos Matriculados</h2>
+            <ul class="participant-list" id="lista-alunos">
+                <!-- Alunos serão preenchidos aqui -->
+            </ul>
         </div>
+
         <div class="card">
-            <h2>Minhas Turmas</h2>
-            <ul id="lista-minhas-turmas">
-                <!-- preenchido dinamicamente -->
+            <h2>Professor Responsável</h2>
+            <ul class="participant-list" id="lista-professor">
+                <!-- Professor será preenchido aqui -->
             </ul>
         </div>
     </div>
-    <script>
-        // Função genérica para chamar a API do backend (gateway roda na porta 5003)
-        const API_BASE = 'http://localhost:5003';
 
-        // Envio do formulário de entrada de ID
-        document.getElementById('form-entrar-turma').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const idTurma = document.getElementById('input-id-turma').value.trim();
-            const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
-            const payload = { id_turma: idTurma, email: usuario.email };
-            fetch(`${API_BASE}/adicionar_aluno_turma`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(r => r.json())
-                .then(data => {
-                    alert(data.message || data.error || 'Operação concluída');
-                    fetchTurmas();
-                })
-                .catch(err => alert('Erro ao entrar na turma: ' + err.message));
+    <div id="mensagem-estado" class="loading">
+        <span id="mensagem-texto">Buscando informações da turma...</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const turmaId = params.get('id');
+
+            if (!turmaId) {
+                mostrarErro('ID da turma não fornecido na URL.');
+                return;
+            }
+
+            fetchTurmaDetalhes(turmaId);
         });
 
-        // Recupera todas as turmas e lista as que o aluno já faz parte
-        function fetchTurmas() {
-            fetch(`${API_BASE}/listar_turmas`)
-                .then(r => r.json())
-                .then(turmas => {
-                    const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
-                    const lista = document.getElementById('lista-minhas-turmas');
-                    lista.innerHTML = '';
-                    turmas.forEach(t => {
-                        const li = document.createElement('li');
-                        li.textContent = `ID ${t.id}: ${t.nome_turma}`;
-                        const btn = document.createElement('button');
-                        btn.textContent = 'Entrar';
-                        btn.onclick = () => entrarTurma(t.id);
-                        li.appendChild(btn);
-                        lista.appendChild(li);
-                    });
+        function fetchTurmaDetalhes(id) {
+            fetch('http://localhost:5000/api/listar_turmas')
+                .then(response => {
+                    if (!response.ok) throw new Error('Falha ao buscar turmas');
+                    return response.json();
                 })
-                .catch(err => console.error('Erro ao listar turmas', err));
+                .then(turmas => {
+                    const turma = turmas.find(t => t.id == id);
+                    if (!turma) {
+                        mostrarErro('Turma não encontrada. Verifique se o ID está correto.');
+                        return;
+                    }
+                    renderizarTurma(turma);
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    mostrarErro('Erro ao carregar os dados da turma. Tente novamente mais tarde.');
+                });
         }
 
-        function entrarTurma(id) {
-            const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
-            const payload = { id_turma: id, email: usuario.email };
-            fetch(`${API_BASE}/adicionar_aluno_turma`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-                .then(r => r.json())
-                .then(data => alert(data.message || data.error || 'Operação concluída'))
-                .catch(err => alert('Erro ao entrar na turma: ' + err.message));
+        function mostrarErro(mensagem) {
+            document.getElementById('mensagem-texto').innerHTML = `<span class="error-msg">${mensagem}</span>`;
+            document.getElementById('mensagem-estado').style.display = 'block';
+            document.getElementById('conteudo-turma').style.display = 'none';
         }
 
-        // Carrega as turmas ao abrir a página
-        document.addEventListener('DOMContentLoaded', fetchTurmas);
+        function getIniciais(email) {
+            if (!email) return '?';
+            const nome = email.split('@')[0];
+            return nome.substring(0, 2).toUpperCase();
+        }
+
+        function renderizarTurma(turma) {
+            document.getElementById('mensagem-estado').style.display = 'none';
+            document.getElementById('conteudo-turma').style.display = 'grid';
+
+            document.getElementById('turma-titulo').textContent = turma.nome_turma || `Turma #${turma.id}`;
+
+            // Renderizar Professor
+            const listaProf = document.getElementById('lista-professor');
+            listaProf.innerHTML = '';
+            const emailProf = turma.professor_email || 'Não atribuído';
+            listaProf.innerHTML = `
+                <li class="participant-item">
+                    <div class="avatar" style="background: #764ba2;">
+                        ${emailProf !== 'Não atribuído' ? getIniciais(emailProf) : '?'}
+                    </div>
+                    <div class="info">
+                        <span class="email" title="${emailProf}">${emailProf}</span>
+                        <span class="role">Professor</span>
+                    </div>
+                </li>
+            `;
+
+            // Renderizar Alunos
+            const listaAlunos = document.getElementById('lista-alunos');
+            listaAlunos.innerHTML = '';
+
+            if (!turma.alunos || turma.alunos.length === 0) {
+                listaAlunos.innerHTML = '<li style="color: #666; padding: 15px 0;">Nenhum aluno matriculado nesta turma ainda.</li>';
+            } else {
+                turma.alunos.forEach(alunoEmail => {
+                    const li = document.createElement('li');
+                    li.className = 'participant-item';
+                    li.innerHTML = `
+                        <div class="avatar">
+                            ${getIniciais(alunoEmail)}
+                        </div>
+                        <div class="info">
+                            <span class="email" title="${alunoEmail}">${alunoEmail}</span>
+                            <span class="role">Aluno</span>
+                        </div>
+                    `;
+                    listaAlunos.appendChild(li);
+                });
+            }
+        }
     </script>
 </body>
 
