@@ -21,10 +21,15 @@ def save_classes(turma):
 def registro_turma():
 
     try:
-        with open(CLASS_FILE, 'r') as f:
-            classes = json.load(f)
-    except:
-        return jsonify({'error': 'Não foi possivel carregar o Json (ou não existe)'}), 404
+        if os.path.exists(CLASS_FILE):
+            with open(CLASS_FILE, 'r', encoding='utf-8') as f:
+                classes = json.load(f)
+        else:
+            classes = []
+
+    except Exception as e:
+        return jsonify({'error': f'Erro ao carregar turmas: {str(e)}'}), 500
+
 
     try:
         
@@ -37,14 +42,16 @@ def registro_turma():
             return jsonify({'error': 'Nenhum dado foi enviado'}), 400 #se n tiver dados, só retorna um erro
         
         nome_turma = data.get('nome_turma', '').strip() #pega o nome da turma
+        professor_email = data.get('professor_email', '').strip()
         
-        if nome_turma in classes:
+        if any(t['nome_turma'] == nome_turma for t in classes):
             return jsonify({'error': 'Turma já cadastrada'}), 400 #se o nome já for registrado, retorna outro erro
         
-        id_turma = classes[-1].get('id_turma', 0) + 1 if classes else 1 #pega o id do ultimo e salva +1 ou, se não tiver nenhum, salva como 1
+        id_turma = classes[-1].get('id', 0) + 1 if classes else 1 #pega o id do ultimo e salva +1 ou, se não tiver nenhum, salva como 1
         
         nova_turma = {
             'nome_turma': nome_turma,
+            'professor_email': professor_email,
             'id': id_turma,
             'alunos': [],
             'aulas': []
@@ -54,6 +61,8 @@ def registro_turma():
         #adiciona no json e salva
         classes.append(nova_turma)
         save_classes(classes)
+
+        return jsonify({'message': 'Turma registrada com sucesso!', 'id': id_turma}), 201
 
         
         

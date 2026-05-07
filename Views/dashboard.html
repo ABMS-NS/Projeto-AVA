@@ -260,7 +260,7 @@
                     <label for="entrada-turma">Número da Turma</label>
                     <input type="text" id="entrada-turma" ...>
                     <button>Entrar</button>
-                    </div>  //corrigido mds do céu
+                    </div>
                 </form>                          
             </div>                              
             </div>
@@ -290,21 +290,23 @@
                 <h2>Minhas Turmas</h2>
                 <div class="card">
                     <h2>Criar Turmas</h2>
-                    <form id= "nome-turma">
-                        <label for="nome-tuma">Nome da Turma</label>
-                        <input type="text" id="nome-turma" ...>
+                    <form id="form-criar-turma">
+                        <label for="input-nome-tuma">Nome da Turma</label>
+                        <input type="text" id="input-nome-turma" name="nome_turma" placeholder="Ex: Turma de Engenharia de Software">
                         <button id="criar-turma">Criar</button>
                     </form>
                 </div>
             </div>
 
             <script>
-            document.getElementById('nome-turma').addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita o reload da página
-            
-            // Pega os valores das caixinhas
-            const nome_turma = document.getElementById('nome-turma').value;
-            
+            document.getElementById('form-criar-turma').addEventListener('submit', function(event) {
+                event.preventDefault(); // Evita o reload da página
+                
+                // Pega o valor do campo de entrada correto
+                const nome_turma = document.getElementById('input-nome-turma').value;
+                // Recupera os dados do professor logado
+                const usuarioLogado = JSON.parse(localStorage.getItem('usuario'));
+
             // Envia os dados para o gateway (porta 5000)
             fetch('http://localhost:5000/api/registro_turma', {
                 method: 'POST',
@@ -312,21 +314,22 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    nome_turma: nome_turma
+                    nome_turma: nome_turma,
+                    professor_email: usuarioLogado ? usuarioLogado.email : 'desconhecido'
                 })
             })
             .then(response => response.json())
             .then(data => {
                 // Aqui você pode adicionar mais lógica, como exibir uma mensagem de sucesso
-                alert('Turma registrada com sucesso!');
+                alert(data.message || 'Turma registrada com sucesso!');
             })
             .catch(error => {
                 // Aqui você pode adicionar mais lógica, como exibir uma mensagem de erro
-                alert('Erro ao registrar turma.');
+                alert('Erro ao registrar turma: ' + error.message);
             })
             .finally(() => {
-                // Recarrega a página após o fetch
-                location.reload();
+                // Recarrega a página após o fetch (opcional, pode ser substituído por feedback visual)
+                location.reload(); 
             });
         });
 
@@ -351,10 +354,8 @@
                 </div>
             </div>
 
-
                 </div>
             </div>
-        </div>
     </div>
 
     <script>

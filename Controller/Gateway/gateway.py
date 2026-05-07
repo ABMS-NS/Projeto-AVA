@@ -127,13 +127,13 @@ def api_login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/registro_turma')
+@app.route('/api/registro_turma', methods=['POST'])
 def api_registro_turma():
     """API para registrar turma via JSON"""
 
     try:
         data = request.get_json()
-        response = request.post(
+        response = requests.post(
             f'{CLASSES_SERVICE}/registro_turma',
             json = data,
             timeout=5
