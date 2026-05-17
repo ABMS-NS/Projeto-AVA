@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula - AVA</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: block;
+            min-height: 100vh;
+        }
+
+        .header-top {
+            background: #2d1b4e;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-top h1 {
+            margin: 0;
+            color: white;
+            font-size: 1.5em;
+            text-align: left;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-voltar {
+            background-color: #667eea;
+            padding: 8px 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            margin: 0;
+            width: auto;
+        }
+
+        .btn-voltar:hover {
+            background-color: #556fd1;
+        }
+
+        .content-area {
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .card h2 {
+            color: #333;
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .card.assunto-card {
+            border-left-color: #27ae60;
+        }
+
+        .card.professor-card {
+            border-left-color: #764ba2;
+        }
+
+        .card.timer-card {
+            border-left-color: #e67e22;
+        }
+
+        .card.acoes-card {
+            border-left-color: #3498db;
+        }
+
+        .loading,
+        .error-msg {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .error-msg {
+            color: #e74c3c;
+        }
+
+        .aula-assunto {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: #27ae60;
+            margin: 0;
+        }
+
+        .professor-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .professor-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #764ba2;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .professor-nome {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .professor-email {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .timer-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-display.expirado {
+            color: #e74c3c;
+        }
+
+        .timer-label {
+            text-align: center;
+            font-size: 0.95em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+
+        .status-badge.ativa {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.encerrada {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .acoes {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-presenca {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05em;
+            width: auto;
+            transition: background 0.3s;
+        }
+
+        .btn-presenca:hover {
+            background: #219a52;
+        }
+
+        .btn-presenca.registrado {
+            background: #95a5a6;
+            cursor: default;
+        }
+
+        .btn-encerrar {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05em;
+            width: auto;
+            transition: background 0.3s;
+        }
+
+        .btn-encerrar:hover {
+            background: #c0392b;
+        }
+
+        .btn-encerrar:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .frequencia-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0 0 0;
+        }
+
+        .frequencia-list li {
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.95em;
+        }
+
+        .frequencia-list li:last-child {
+            border-bottom: none;
+        }
+
+        .frequencia-list li.presente {
+            color: #27ae60;
+        }
+
+        .frequencia-list li.ausente {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-top">
+        <h1 id="aula-titulo">Carregando Aula...</h1>
+        <div class="header-right">
+            <span id="status-badge" class="status-badge">---</span>
+            <a href="javascript:history.back()" class="btn-voltar">Voltar</a>
+        </div>
+    </div>
+
+    <div class="content-area" id="conteudo-aula" style="display: none;">
+        <div class="card assunto-card">
+            <h2>Assunto da Aula</h2>
+            <p class="aula-assunto" id="aula-assunto">---</p>
+        </div>
+
+        <div class="card professor-card">
+            <h2>Professor</h2>
+            <div class="professor-info" id="professor-info">
+                <div class="professor-avatar" id="professor-avatar">?</div>
+                <div>
+                    <div class="professor-nome" id="professor-nome">Carregando...</div>
+                    <div class="professor-email" id="professor-email">---</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card timer-card" id="timer-card">
+            <h2>Tempo Restante</h2>
+            <div class="timer-display" id="timer-display">--:--:--</div>
+            <div class="timer-label" id="timer-label">Aguardando...</div>
+        </div>
+
+        <div class="card acoes-card" id="card-acoes">
+            <h2>Ações</h2>
+            <div class="acoes" id="acoes-container">
+            </div>
+            <ul class="frequencia-list" id="frequencia-list" style="display: none;">
+            </ul>
+        </div>
+    </div>
+
+    <div id="mensagem-estado" class="loading">
+        <span id="mensagem-texto">Carregando aula...</span>
+    </div>
+
+    <script>
+        let timerInterval = null;
+        let aulaData = null;
+        let turmaData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const idTurma = params.get('id_turma');
+            const idAula = params.get('id_aula');
+
+            if (!idTurma || !idAula) {
+                mostrarErro('Parâmetros id_turma e id_aula são obrigatórios.');
+                return;
+            }
+
+            carregarAula(idTurma, idAula);
+        });
+
+        function carregarAula(idTurma, idAula) {
+            fetch('http://localhost:5000/api/listar_turmas')
+                .then(r => r.json())
+                .then(turmas => {
+                    const turma = turmas.find(t => t.id == idTurma);
+                    if (!turma) throw new Error('Turma não encontrada');
+
+                    turmaData = turma;
+                    const aula = (turma.aulas || []).find(a => a.id == idAula);
+                    if (!aula) throw new Error('Aula não encontrada');
+
+                    aulaData = aula;
+                    renderizarAula(turma, aula);
+
+                    if (aula.status === 'ativa') {
+                        iniciarTimer(aula);
+                    } else {
+                        pararTimer();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    mostrarErro('Erro ao carregar aula: ' + err.message);
+                });
+        }
+
+        function mostrarErro(mensagem) {
+            document.getElementById('mensagem-texto').innerHTML = `<span class="error-msg">${mensagem}</span>`;
+            document.getElementById('mensagem-estado').style.display = 'block';
+            document.getElementById('conteudo-aula').style.display = 'none';
+        }
+
+        function getIniciais(str) {
+            if (!str) return '?';
+            const nome = str.split('@')[0];
+            return nome.substring(0, 2).toUpperCase();
+        }
+
+        function renderizarAula(turma, aula) {
+            document.getElementById('mensagem-estado').style.display = 'none';
+            document.getElementById('conteudo-aula').style.display = 'block';
+
+            document.getElementById('aula-titulo').textContent = turma.nome_turma + ' - Aula #' + aula.id;
+
+            const badge = document.getElementById('status-badge');
+            badge.textContent = aula.status === 'ativa' ? 'Ativa' : 'Encerrada';
+            badge.className = 'status-badge ' + (aula.status === 'ativa' ? 'ativa' : 'encerrada');
+
+            document.getElementById('aula-assunto').textContent = aula.assunto || 'Sem assunto definido';
+
+            const emailProf = turma.professor_email || '---';
+            document.getElementById('professor-email').textContent = emailProf;
+            document.getElementById('professor-avatar').textContent = getIniciais(emailProf);
+
+            fetch('http://localhost:5000/api/buscar_usuario?email=' + encodeURIComponent(emailProf))
+                .then(r => r.json())
+                .then(user => {
+                    if (user.nome) {
+                        document.getElementById('professor-nome').textContent = user.nome;
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('professor-nome').textContent = emailProf.split('@')[0];
+                });
+
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            const container = document.getElementById('acoes-container');
+            container.innerHTML = '';
+
+            if (usuario) {
+                if (usuario.tipo === 'aluno' && aula.status === 'ativa') {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-presenca';
+                    btn.textContent = 'Registrar Presença';
+                    btn.onclick = () => registrarPresenca(turma.id, aula.id);
+                    container.appendChild(btn);
+                }
+
+                if (usuario.tipo === 'professor' && usuario.email === turma.professor_email && aula.status === 'ativa') {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-encerrar';
+                    btn.textContent = 'Encerrar Aula';
+                    btn.onclick = () => encerrarAula(turma.id, aula.id);
+                    container.appendChild(btn);
+                }
+
+                if (aula.status === 'encerrada') {
+                    const msg = document.createElement('p');
+                    msg.style.color = '#666';
+                    msg.style.margin = '0';
+                    msg.textContent = 'Esta aula foi encerrada.';
+                    container.appendChild(msg);
+                }
+            }
+
+            if (aula.status === 'encerrada' && usuario && usuario.tipo === 'professor' && usuario.email === turma.professor_email) {
+                buscarFrequencia(turma.id, aula.id);
+            }
+        }
+
+        function iniciarTimer(aula) {
+            const dataInicio = new Date(aula.data_inicio);
+            const duracaoMs = (aula.duracao_segundos || 3600) * 1000;
+            const fim = new Date(dataInicio.getTime() + duracaoMs);
+
+            function atualizar() {
+                const agora = new Date();
+                const diff = fim.getTime() - agora.getTime();
+                const display = document.getElementById('timer-display');
+                const label = document.getElementById('timer-label');
+
+                if (diff <= 0) {
+                    display.textContent = '00:00:00';
+                    display.className = 'timer-display expirado';
+                    label.textContent = 'Tempo esgotado!';
+                    pararTimer();
+                    return;
+                }
+
+                display.className = 'timer-display';
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                display.textContent =
+                    String(h).padStart(2, '0') + ':' +
+                    String(m).padStart(2, '0') + ':' +
+                    String(s).padStart(2, '0');
+
+                label.textContent = 'Aula em andamento';
+            }
+
+            atualizar();
+            timerInterval = setInterval(atualizar, 1000);
+        }
+
+        function pararTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function registrarPresenca(idTurma, idAula) {
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuario) { alert('Usuário não logado'); return; }
+
+            fetch('http://localhost:5000/api/registrar_presenca_aula', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: usuario.email,
+                    id_turma: idTurma,
+                    id_aula: idAula
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    alert(data.message || data.error);
+                    if (data.aula) {
+                        const btn = document.querySelector('.btn-presenca');
+                        btn.textContent = 'Presença Registrada ✓';
+                        btn.className = 'btn-presenca registrado';
+                        btn.disabled = true;
+                    }
+                })
+                .catch(err => {
+                    alert('Erro ao registrar presença: ' + err.message);
+                });
+        }
+
+        function encerrarAula(idTurma, idAula) {
+            if (!confirm('Tem certeza que deseja encerrar esta aula?')) return;
+
+            fetch('http://localhost:5000/api/terminar_aula', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_turma: idTurma,
+                    id_aula: idAula
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    alert(data.message || data.error);
+                    if (data.frequencia) {
+                        pararTimer();
+                        document.getElementById('timer-display').textContent = '00:00:00';
+                        document.getElementById('timer-display').className = 'timer-display expirado';
+                        document.getElementById('timer-label').textContent = 'Aula encerrada';
+                        document.getElementById('status-badge').textContent = 'Encerrada';
+                        document.getElementById('status-badge').className = 'status-badge encerrada';
+                        document.getElementById('acoes-container').innerHTML = '<p style="color:#666;margin:0;">Aula encerrada com sucesso!</p>';
+                        mostrarFrequencia(data.frequencia);
+                    }
+                })
+                .catch(err => {
+                    alert('Erro ao encerrar aula: ' + err.message);
+                });
+        }
+
+        function buscarFrequencia(idTurma, idAula) {
+            fetch('http://localhost:5000/api/listar_frequencias_aula?id_turma=' + idTurma + '&id_aula=' + idAula)
+                .then(r => r.json())
+                .then(freqs => {
+                    if (freqs && freqs.length > 0) {
+                        mostrarFrequencia(freqs[0]);
+                    }
+                })
+                .catch(() => {});
+        }
+
+        function mostrarFrequencia(frequencia) {
+            const lista = document.getElementById('frequencia-list');
+            lista.style.display = 'block';
+            lista.innerHTML = '';
+
+            const presentes = frequencia.alunos_presentes || [];
+            const ausentes = frequencia.alunos_ausentes || [];
+
+            if (presentes.length > 0) {
+                const header = document.createElement('li');
+                header.style.fontWeight = 'bold';
+                header.style.color = '#27ae60';
+                header.textContent = '✓ Presentes (' + presentes.length + ')';
+                lista.appendChild(header);
+                presentes.forEach(email => {
+                    const li = document.createElement('li');
+                    li.className = 'presente';
+                    li.textContent = '✓ ' + email;
+                    lista.appendChild(li);
+                });
+            }
+
+            if (ausentes.length > 0) {
+                const header = document.createElement('li');
+                header.style.fontWeight = 'bold';
+                header.style.color = '#e74c3c';
+                header.textContent = '✗ Ausentes (' + ausentes.length + ')';
+                lista.appendChild(header);
+                ausentes.forEach(email => {
+                    const li = document.createElement('li');
+                    li.className = 'ausente';
+                    li.textContent = '✗ ' + email;
+                    lista.appendChild(li);
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
