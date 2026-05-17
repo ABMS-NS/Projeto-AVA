@@ -14,4 +14,5 @@
 
 - Fazer o diagrama de sequência do sistema de Turmas e Aulas
 - Fazer o diagrama de componentes desse sistema isolado (foi feito o RF07 junto no diagrama para facilitar o entendimento)
-- 
+- Implementação:
+    - implementação das turmas(06/05 - 08/05)

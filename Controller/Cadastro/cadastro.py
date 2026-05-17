@@ -69,8 +69,7 @@ def cadastro():
             'email': email,
             'tipo': 'aluno',  #sempre "aluno" para auto-cadastro
             'senha': generate_password_hash(senha),
-            'notas': [],
-            'turmas': []
+            'notas': []
         }
         
         #adiciona o novo usuário na lista

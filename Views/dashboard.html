@@ -350,14 +350,32 @@
                     fetch('http://localhost:5000/api/listar_turmas')
                         .then(response => response.json())
                         .then(turmas => {
+                            const usuario = JSON.parse(localStorage.getItem('usuario'));
                             const lista = document.getElementById('turmas-lista');
                             lista.innerHTML = '';
                             if (Array.isArray(turmas) && turmas.length > 0) {
-                                turmas.forEach(t => {
-                                    const li = document.createElement('li');
-                                    li.textContent = `ID ${t.id}: ${t.nome_turma}`;
-                                    lista.appendChild(li);
-                                });
+                                const minhas = usuario ? turmas.filter(t => t.professor_email === usuario.email) : turmas;
+                                if (minhas.length > 0) {
+                                    minhas.forEach(t => {
+                                        const li = document.createElement('li');
+                                        li.style.display = 'flex';
+                                        li.style.justifyContent = 'space-between';
+                                        li.style.alignItems = 'center';
+                                        li.style.padding = '10px 0';
+                                        li.style.borderBottom = '1px solid #f0f0f0';
+                                        li.innerHTML = `<span>ID ${t.id}: ${t.nome_turma}</span>`;
+                                        const btn = document.createElement('button');
+                                        btn.textContent = 'Gerenciar';
+                                        btn.style.width = 'auto';
+                                        btn.style.padding = '6px 14px';
+                                        btn.style.fontSize = '0.9em';
+                                        btn.addEventListener('click', () => { window.location.href = '/turma.html?id=' + t.id; });
+                                        li.appendChild(btn);
+                                        lista.appendChild(li);
+                                    });
+                                } else {
+                                    lista.innerHTML = '<li style="color:#666;padding:10px 0;">Nenhuma turma sua encontrada.</li>';
+                                }
                             } else {
                                 lista.innerHTML = '<li>Nenhuma turma cadastrada.</li>';
                             }
@@ -380,8 +398,10 @@
             <div class="page" id="frequencia">
                 <h2>Frequência</h2>
                 <div class="card">
-                    <h2>Frequência dos Alunos</h2>
-                    <p>Monitore a frequência dos seus alunos.</p>
+                    <h2>Frequência das Aulas</h2>
+                    <div id="frequencia-lista">
+                        <p style="color:#666;">Carregando frequências...</p>
+                    </div>
                 </div>
             </div>
 
@@ -427,6 +447,10 @@
 
                 // Atualiza título
                 pageTitle.textContent = this.textContent;
+
+                if (pageId === 'frequencia') {
+                    carregarFrequencias();
+                }
 
                 // Fecha sidebar em mobile
                 if (window.innerWidth <= 768) {
@@ -487,6 +511,91 @@
         }
         // Load on page load
         document.addEventListener('DOMContentLoaded', fetchMinhasTurmas);
+
+        function carregarFrequencias() {
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+            if (!usuario) return;
+
+            const container = document.getElementById('frequencia-lista');
+            container.innerHTML = '<p style="color:#666;">Carregando frequências...</p>';
+
+            fetch('http://localhost:5000/api/listar_turmas')
+                .then(r => r.json())
+                .then(turmas => {
+                    const minhasTurmas = turmas.filter(t => t.professor_email === usuario.email);
+                    if (minhasTurmas.length === 0) {
+                        container.innerHTML = '<p style="color:#666;">Nenhuma turma encontrada.</p>';
+                        return;
+                    }
+
+                    return fetch('http://localhost:5000/api/listar_frequencias')
+                        .then(r => r.json())
+                        .then(todasFrequencias => {
+                            const minhasFrequencias = todasFrequencias.filter(f =>
+                                minhasTurmas.some(t => t.id === f.id_turma)
+                            );
+
+                            minhasFrequencias.sort((a, b) => {
+                                if (a.data !== b.data) return b.data.localeCompare(a.data);
+                                return (b.inicio || '').localeCompare(a.inicio || '');
+                            });
+
+                            if (minhasFrequencias.length === 0) {
+                                container.innerHTML = '<p style="color:#666;">Nenhuma frequência registrada.</p>';
+                                return;
+                            }
+
+                            container.innerHTML = '';
+
+                            minhasFrequencias.forEach(freq => {
+                                const turma = minhasTurmas.find(t => t.id === freq.id_turma);
+                                const nomeTurma = turma ? turma.nome_turma : `Turma #${freq.id_turma}`;
+                                const data = freq.data ? new Date(freq.data + 'T12:00:00').toLocaleDateString('pt-BR') : '-';
+                                const inicio = freq.inicio ? new Date(freq.inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '-';
+                                const presentes = (freq.alunos_presentes || []).length;
+                                const ausentes = (freq.alunos_ausentes || []).length;
+                                const total = freq.total_alunos || 0;
+
+                                const item = document.createElement('div');
+                                item.style.cssText = 'padding: 15px 0; border-bottom: 1px solid #f0f0f0;';
+                                item.innerHTML = `
+                                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                                        <div>
+                                            <strong style="color:#333;">${nomeTurma}</strong>
+                                            <div style="font-size:0.9em;color:#666;margin-top:4px;">
+                                                ${data} às ${inicio}
+                                                ${freq.assunto ? ' — ' + freq.assunto : ''}
+                                            </div>
+                                        </div>
+                                        <div style="text-align:right;">
+                                            <span style="color:#27ae60;font-weight:bold;font-size:1.1em;">${presentes}</span>
+                                            <span style="color:#666;"> / </span>
+                                            <span style="color:#e74c3c;font-weight:bold;font-size:1.1em;">${ausentes}</span>
+                                        </div>
+                                    </div>
+                                `;
+
+                                if (presentes > 0 || ausentes > 0) {
+                                    const detalhes = document.createElement('div');
+                                    detalhes.style.cssText = 'margin-top:8px;font-size:0.85em;color:#555;padding-left:10px;border-left:2px solid #667eea;';
+                                    detalhes.innerHTML = '<div style="margin-bottom:4px;"><strong>Presentes:</strong> ' +
+                                        (freq.alunos_presentes || []).map(e => e.split('@')[0]).join(', ') +
+                                        '</div>' +
+                                        '<div><strong>Ausentes:</strong> ' +
+                                        (freq.alunos_ausentes || []).map(e => e.split('@')[0]).join(', ') +
+                                        '</div>';
+                                    item.appendChild(detalhes);
+                                }
+
+                                container.appendChild(item);
+                            });
+                        });
+                })
+                .catch(err => {
+                    console.error('Erro ao carregar frequências:', err);
+                    container.innerHTML = '<p style="color:#e74c3c;">Erro ao carregar frequências.</p>';
+                });
+        }
 
     </script>
 </body>

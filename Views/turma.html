@@ -13,7 +13,6 @@
             margin: 0;
             padding: 0;
             display: block;
-            /* Override default body flex from styles.css */
             min-height: 100vh;
         }
 
@@ -74,6 +73,10 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             border-left: 4px solid #667eea;
+        }
+
+        .card.full {
+            grid-column: 1 / -1;
         }
 
         .card h2 {
@@ -146,6 +149,94 @@
         .error-msg {
             color: #e74c3c;
         }
+
+        .aula-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .aula-item:last-child {
+            border-bottom: none;
+        }
+
+        .aula-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .aula-assunto {
+            font-weight: bold;
+            color: #333;
+            font-size: 1em;
+        }
+
+        .aula-status {
+            font-size: 0.85em;
+        }
+
+        .aula-status.ativa {
+            color: #27ae60;
+        }
+
+        .aula-status.encerrada {
+            color: #e74c3c;
+        }
+
+        .aula-data {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .btn-entrar {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: auto;
+            transition: background 0.3s;
+        }
+
+        .btn-entrar:hover {
+            background: #219a52;
+        }
+
+        .btn-entrar.encerrada {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .form-aula {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-aula input,
+        .form-aula select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .form-aula button {
+            width: auto;
+            align-self: flex-start;
+        }
+
+        .sem-aulas {
+            color: #666;
+            padding: 15px 0;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -168,6 +259,22 @@
             <ul class="participant-list" id="lista-professor">
                 <!-- Professor será preenchido aqui -->
             </ul>
+        </div>
+
+        <div class="card full" id="card-aulas" style="display: none;">
+            <h2>Aulas</h2>
+            <div id="aula-list">
+                <div class="sem-aulas">Nenhuma aula cadastrada.</div>
+            </div>
+        </div>
+
+        <div class="card full" id="card-iniciar-aula" style="display: none;">
+            <h2>Iniciar Nova Aula</h2>
+            <form class="form-aula" id="form-iniciar-aula">
+                <input type="text" id="input-assunto" placeholder="Assunto da aula (ex: Introdução à POO)" required>
+                <input type="number" id="input-duracao" placeholder="Duração em minutos (ex: 60)" value="60" min="1" required>
+                <button type="submit">Iniciar Aula</button>
+            </form>
         </div>
     </div>
 
@@ -226,6 +333,8 @@
 
             document.getElementById('turma-titulo').textContent = turma.nome_turma || `Turma #${turma.id}`;
 
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+
             // Renderizar Professor
             const listaProf = document.getElementById('lista-professor');
             listaProf.innerHTML = '';
@@ -264,6 +373,90 @@
                     listaAlunos.appendChild(li);
                 });
             }
+
+            // Renderizar Aulas
+            renderizarAulas(turma);
+
+            // Se for professor desta turma, mostra form para iniciar aula
+            if (usuario && usuario.tipo === 'professor' && usuario.email === turma.professor_email) {
+                document.getElementById('card-iniciar-aula').style.display = 'block';
+                document.getElementById('form-iniciar-aula').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    iniciarAula(turma.id);
+                });
+            }
+        }
+
+        function renderizarAulas(turma) {
+            const aulas = turma.aulas || [];
+            const container = document.getElementById('aula-list');
+            const card = document.getElementById('card-aulas');
+
+            if (aulas.length === 0) {
+                card.style.display = 'none';
+                return;
+            }
+
+            card.style.display = 'block';
+            container.innerHTML = '';
+            const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+            aulas.forEach(aula => {
+                const div = document.createElement('div');
+                div.className = 'aula-item';
+
+                const statusClass = aula.status === 'ativa' ? 'ativa' : 'encerrada';
+                const statusLabel = aula.status === 'ativa' ? 'Ativa' : 'Encerrada';
+                const dataInicio = aula.data_inicio ? new Date(aula.data_inicio).toLocaleString('pt-BR') : '-';
+
+                div.innerHTML = `
+                    <div class="aula-info">
+                        <span class="aula-assunto">${aula.assunto || 'Sem assunto'}</span>
+                        <span class="aula-status ${statusClass}">${statusLabel}</span>
+                        <span class="aula-data">${dataInicio}</span>
+                    </div>
+                    <button class="btn-entrar ${aula.status !== 'ativa' ? 'encerrada' : ''}"
+                        ${aula.status !== 'ativa' ? 'disabled' : ''}
+                        onclick="entrarAula(${turma.id}, ${aula.id})">
+                        ${aula.status === 'ativa' ? 'Entrar' : 'Finalizada'}
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function iniciarAula(idTurma) {
+            const assunto = document.getElementById('input-assunto').value.trim();
+            const duracao = parseInt(document.getElementById('input-duracao').value) * 60;
+
+            if (!assunto) {
+                alert('Digite o assunto da aula.');
+                return;
+            }
+
+            fetch('http://localhost:5000/api/iniciar_aula', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id_turma: idTurma,
+                    assunto: assunto,
+                    duracao: duracao
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    alert(data.message || data.error);
+                    if (data.aula) {
+                        window.location.href = '/aula.html?id_turma=' + idTurma + '&id_aula=' + data.aula.id;
+                    }
+                })
+                .catch(err => {
+                    alert('Erro ao iniciar aula: ' + err.message);
+                });
+        }
+
+        function entrarAula(idTurma, idAula) {
+            window.location.href = '/aula.html?id_turma=' + idTurma + '&id_aula=' + idAula;
         }
     </script>
 </body>
