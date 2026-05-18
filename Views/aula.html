@@ -423,6 +423,8 @@
             }
         }
 
+        let autoEnded = false;
+
         function iniciarTimer(aula) {
             const dataInicio = new Date(aula.data_inicio);
             const duracaoMs = (aula.duracao_segundos || 3600) * 1000;
@@ -434,11 +436,17 @@
                 const display = document.getElementById('timer-display');
                 const label = document.getElementById('timer-label');
 
-                if (diff <= 0) {
+                if (diff <= 0 && !autoEnded) {
                     display.textContent = '00:00:00';
                     display.className = 'timer-display expirado';
-                    label.textContent = 'Tempo esgotado!';
+                    label.textContent = 'Encerrando aula...';
                     pararTimer();
+                    autoEnded = true;
+                    encerrarAula(turmaData.id, aulaData.id, true);
+                    return;
+                }
+
+                if (diff <= 0) {
                     return;
                 }
 
@@ -493,8 +501,8 @@
                 });
         }
 
-        function encerrarAula(idTurma, idAula) {
-            if (!confirm('Tem certeza que deseja encerrar esta aula?')) return;
+        function encerrarAula(idTurma, idAula, autoEnd) {
+            if (!autoEnd && !confirm('Tem certeza que deseja encerrar esta aula?')) return;
 
             fetch('http://localhost:5000/api/terminar_aula', {
                 method: 'POST',
@@ -506,20 +514,27 @@
             })
                 .then(r => r.json())
                 .then(data => {
-                    alert(data.message || data.error);
+                    if (!autoEnd) {
+                        alert(data.message || data.error);
+                    }
+                    pararTimer();
+                    document.getElementById('timer-display').textContent = '00:00:00';
+                    document.getElementById('timer-display').className = 'timer-display expirado';
+                    document.getElementById('timer-label').textContent = 'Aula encerrada';
+                    document.getElementById('status-badge').textContent = 'Encerrada';
+                    document.getElementById('status-badge').className = 'status-badge encerrada';
+
                     if (data.frequencia) {
-                        pararTimer();
-                        document.getElementById('timer-display').textContent = '00:00:00';
-                        document.getElementById('timer-display').className = 'timer-display expirado';
-                        document.getElementById('timer-label').textContent = 'Aula encerrada';
-                        document.getElementById('status-badge').textContent = 'Encerrada';
-                        document.getElementById('status-badge').className = 'status-badge encerrada';
-                        document.getElementById('acoes-container').innerHTML = '<p style="color:#666;margin:0;">Aula encerrada com sucesso!</p>';
+                        document.getElementById('acoes-container').innerHTML = '<p style="color:#666;margin:0;">Aula encerrada pelo timer.</p>';
                         mostrarFrequencia(data.frequencia);
+                    } else {
+                        document.getElementById('acoes-container').innerHTML = '<p style="color:#666;margin:0;">Aula encerrada.</p>';
                     }
                 })
                 .catch(err => {
-                    alert('Erro ao encerrar aula: ' + err.message);
+                    if (!autoEnd) {
+                        alert('Erro ao encerrar aula: ' + err.message);
+                    }
                 });
         }
 
