@@ -6,6 +6,9 @@ import json
 app = Flask(__name__, template_folder='../../Views', static_folder='../../Views', static_url_path='/static')
 CORS(app)
 
+#comentario novo
+
+
 # URLs dos microsserviços
 CADASTRO_SERVICE = 'http://localhost:5001'
 LOGIN_SERVICE = 'http://localhost:5002'
