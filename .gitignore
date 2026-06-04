@@ -45,6 +45,8 @@ htmlcov/
 *.cover
 
 # Banco de dados
+legado/
+*.db
 *.json
 !exemplo_users.json
 

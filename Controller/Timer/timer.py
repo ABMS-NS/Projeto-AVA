@@ -1,29 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import json
-import os
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-TIMER_FILE = os.path.join(os.path.dirname(__file__), '../../database/timer.json')
+timers = {}
 
 
-def load_timers():
-    if os.path.exists(TIMER_FILE):
-        try:
-            with open(TIMER_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except (json.JSONDecodeError, ValueError):
-            return {}
-    return {}
-
-
-def save_timers(timers):
-    os.makedirs(os.path.dirname(TIMER_FILE), exist_ok=True)
-    with open(TIMER_FILE, 'w', encoding='utf-8') as f:
-        json.dump(timers, f, indent=2, ensure_ascii=False)
+def timer_key(id_turma, id_aula):
+    return f"{id_turma}_{id_aula}"
 
 
 @app.route('/timer/iniciar', methods=['POST'])
@@ -42,7 +28,6 @@ def timer_iniciar():
         if not id_turma or not id_aula:
             return jsonify({'error': 'id_turma e id_aula são obrigatórios'}), 400
 
-        timers = load_timers()
         chave = timer_key(id_turma, id_aula)
 
         if chave in timers:
@@ -58,8 +43,6 @@ def timer_iniciar():
             'alunos_presentes': [],
             'registros_frequencia': []
         }
-
-        save_timers(timers)
 
         return jsonify({
             'message': 'Timer iniciado com sucesso!',
@@ -86,7 +69,6 @@ def timer_registrar_presenca():
         if not email or not id_turma or not id_aula:
             return jsonify({'error': 'email, id_turma e id_aula são obrigatórios'}), 400
 
-        timers = load_timers()
         chave = timer_key(id_turma, id_aula)
 
         if chave not in timers:
@@ -101,8 +83,6 @@ def timer_registrar_presenca():
             'email': email,
             'hora_entrada': datetime.now().isoformat()
         })
-
-        save_timers(timers)
 
         return jsonify({'message': 'Presença registrada no timer com sucesso!'}), 200
 
@@ -125,14 +105,12 @@ def timer_encerrar():
         if not id_turma or not id_aula:
             return jsonify({'error': 'id_turma e id_aula são obrigatórios'}), 400
 
-        timers = load_timers()
         chave = timer_key(id_turma, id_aula)
 
         if chave not in timers:
             return jsonify({'error': 'Timer não encontrado para esta aula'}), 404
 
         timer = timers.pop(chave)
-        save_timers(timers)
 
         return jsonify({
             'message': 'Timer encerrado com sucesso!',
@@ -155,7 +133,6 @@ def timer_status():
         if not id_turma or not id_aula:
             return jsonify({'error': 'id_turma e id_aula são obrigatórios'}), 400
 
-        timers = load_timers()
         chave = timer_key(id_turma, id_aula)
 
         if chave not in timers:
@@ -165,10 +142,6 @@ def timer_status():
 
     except Exception as e:
         return jsonify({'error': f'Erro ao consultar timer: {str(e)}'}), 500
-
-
-def timer_key(id_turma, id_aula):
-    return f"{id_turma}_{id_aula}"
 
 
 if __name__ == '__main__':
