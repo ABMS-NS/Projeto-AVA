@@ -6,15 +6,15 @@
 
 - ✅ **RF02:** O sistema deve permitir que o aluno se cadastre e entre com sua senha sempre que quiser *(Implementado — cadastro.py, login.py)*
 
-- 🔲 **RF03:** O sistema deve permitir que o professor publique notas e o aluno veja as mesmas *(Pendente — única funcionalidade não implementada)*
+- ✅ **RF03:** O sistema deve permitir que o professor publique notas e o aluno veja as mesmas *(Implementado — notas.py, gateway, dashboard.html)*
 
 - ✅ **RF04:** O sistema deve permitir que o professor abra turmas e os alunos possam se cadastrar nelas *(Implementado — turma.py, gateway)*
 
 - ✅ **RF05:** O sistema deve permitir a criação de sessões (ou aulas) dentro de cada turma, onde em cada aula os alunos tenham acesso aos materiais e instruções postas pelo professor em tempo real *(Implementado — criação de aulas, página da aula com assunto, timer e presença)*
 
-- 🔲 **RF06:** O aluno deve ser capaz de visualizar suas notas em um ambiente apropriado *(Pendente — junto com RF03)*
+- ✅ **RF06:** O aluno deve ser capaz de visualizar suas notas em um ambiente apropriado *(Implementado — dashboard.html, página "Minhas Notas" com notas agrupadas por turma e média ponderada)*
 
-- ✅ **RF07:** As sessões de aula devem conter um timer que, ao acabar o tempo, deve encerrar a aula e fazer a chamada *(Parcialmente Implementado — timer.py, contagem regressiva, registro de presença e frequência)*
+- ✅ **RF07:** As sessões de aula devem conter um timer que, ao acabar o tempo, deve encerrar a aula e fazer a chamada *(Implementado — timer.py, contagem regressiva, registro de presença e frequência no SQLite)*
 
 ## Requisitos Não Funcionais
 
@@ -28,4 +28,4 @@
 
 - ✅ **RNF05:** A interface deve ser intuitiva e não requer treinamento prévio do usuário *(Implementado)*
 
-- ✅ **RNF08:** O sistema deve contar com permanência de dados *(Implementado — persistência em JSON)*
+- ✅ **RNF08:** O sistema deve contar com permanência de dados *(Implementado — persistência em SQLite)*

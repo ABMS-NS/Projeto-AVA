@@ -3,10 +3,9 @@
 
 ### Separados por prioridade
 
-Alta: [RF01/RF02] Autenticação e Cadastro (Base para tudo).
-
-Alta: [RF04/RF05] Gestão de Turmas e Sessões (Núcleo do sistema).
-
-Média: [RF07] Timer de aula e chamada automática.
-
-Média: [RF03/RF06] Sistema de Notas.
+| Prioridade | Requisitos | Funcionalidade | Status |
+|------------|-----------|----------------|--------|
+| Alta | RF01/RF02 | Autenticação e Cadastro (Base para tudo) | ✅ Concluído |
+| Alta | RF04/RF05 | Gestão de Turmas e Sessões (Núcleo do sistema) | ✅ Concluído |
+| Média | RF07 | Timer de aula e chamada automática | ✅ Concluído |
+| Média | RF03/RF06 | Sistema de Notas | ✅ Concluído |

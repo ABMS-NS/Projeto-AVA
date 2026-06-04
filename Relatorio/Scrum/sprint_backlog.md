@@ -25,7 +25,7 @@
 
 ## Sprint 2 — Turmas, Aulas e Timer [RF04/RF05/RF07]
 **Período:** 05/05/2026 — 18/05/2026  
-**Status:** ✅ Pendente
+**Status:** ✅ Concluída
 
 ### Planejado:
 - Diagrama de sequência do sistema de Turmas e Aulas
@@ -53,22 +53,35 @@
   - `POST /timer/registrar_presenca` — Registrar_Frequencia
   - `POST /timer/encerrar` — Encerrar_Timer
   - `GET /timer/status` — consultar estado do timer
-  - Persistência em `database/timer.json`
 - ✅ Páginas:
   - `Views/turma.html` — detalhes da turma, listagem de aulas, iniciar nova aula (professor), entrar na aula (aluno)
   - `Views/aula.html` — página da aula com: nome do professor, assunto, timer regressivo, registrar presença, encerrar aula, exibir frequência
 - ✅ Frequência no Dashboard do professor — `dashboard.html` (#frequencia) exibe frequências por aula ordenadas por data
 - ✅ Gateway atualizado com proxies para todos os novos endpoints
-- ✅ Banco de dados JSON: `database/classes.json`, `database/aula.json`, `database/frequences.json`, `database/timer.json`
+- ✅ Banco de dados SQLite com tabelas: `usuarios`, `turmas`, `turma_alunos`, `aulas`, `frequencias`
 
 ---
 
-## Sprint 3 — Sistema de Notas [RF03/RF06] (Pendente)
-**Período:** Não iniciada  
-**Status:** 🔲 Pendente
+## Sprint 3 — Sistema de Notas [RF03/RF06]
+**Período:** 19/05/2026 — 04/06/2026  
+**Status:** ✅ Concluída
 
 ### Planejado:
 - Implementar publicação de notas pelo professor
 - Implementar visualização de notas pelo aluno
 - Páginas e APIs necessárias
 - Testes unitários
+
+### Entregue:
+- ✅ Microsserviço de Notas — `Controller/Notas/notas.py` (porta 5005)
+  - `POST /notas/publicar` — professor lança nota para aluno em uma turma (valida tipo professor, matrícula, nota 0–10)
+  - `GET /notas/listar` — listar notas com filtros por `?turma_id=`, `?aluno_email=`, `?aula_id=`
+  - `GET /notas/aluno` — aluno vê suas próprias notas agrupadas por turma
+  - `PUT /notas/editar` — editar nota existente
+  - `DELETE /notas/remover` — remover nota
+- ✅ Tabela `notas` no banco SQLite — `database/db.py`
+- ✅ Gateway atualizado com rotas proxy (`/api/notas/*`) — `Controller/Gateway/gateway.py`
+- ✅ Dashboard do aluno — página "Minhas Notas" com tabela por turma, lista de notas e média ponderada
+- ✅ Dashboard do professor — página "Lançar Notas" com seleção de turma, lista de alunos e campos para lançar nota, com feedback visual (`alert()`)
+- ✅ 26 testes unitários — `tests/test_notas.py`
+- ✅ **Total: 83 testes passando** (cadastro + login + gateway + notas)
