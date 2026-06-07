@@ -363,8 +363,6 @@
                 <div class="grid">
                     <div class=card>
                         <h2>Olá!</h2>
-                        <p>No futuro teremos algo aqui
-                        </p>
                     </div>
                 </div>
             </div>
@@ -401,7 +399,6 @@
                 <div class="grid">
                     <div class="card">
                         <h2>Olá, Professor!</h2>
-                        <p>No futuro teremos algo aqui</p>
                     </div>
                 </div>
             </div>
@@ -792,31 +789,18 @@
                             table.className = 'notas-table';
                             table.innerHTML = '<thead><tr>' +
                                 '<th>Descrição</th>' +
-                                '<th class="center" style="width:80px;">Nota</th>' +
-                                '<th class="center" style="width:80px;">Peso</th>' +
+                                '<th class="center" style="width:100px;">Nota</th>' +
                                 '<th class="center" style="width:120px;">Data</th>' +
                                 '</tr></thead><tbody>';
 
-                            let soma = 0, somaPesos = 0;
                             turma.notas.forEach(n => {
                                 const data = n.data_lancamento ? new Date(n.data_lancamento).toLocaleDateString('pt-BR') : '-';
                                 table.innerHTML += '<tr>' +
                                     '<td>' + (n.descricao || '-') + '</td>' +
                                     '<td class="center" style="font-weight:bold;color:#2d1b4e;">' + n.nota.toFixed(1) + '</td>' +
-                                    '<td class="center">' + n.peso.toFixed(1) + '</td>' +
                                     '<td class="center">' + data + '</td>' +
                                     '</tr>';
-                                soma += n.nota * n.peso;
-                                somaPesos += n.peso;
                             });
-
-                            const media = somaPesos > 0 ? (soma / somaPesos).toFixed(1) : '-';
-                            table.innerHTML += '<tr class="media-row">' +
-                                '<td>Média</td>' +
-                                '<td class="center"><span class="media-valor">' + media + '</span></td>' +
-                                '<td class="center"></td>' +
-                                '<td class="center"></td>' +
-                                '</tr>';
 
                             table.innerHTML += '</tbody>';
                             div.appendChild(table);
