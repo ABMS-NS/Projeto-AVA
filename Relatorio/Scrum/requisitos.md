@@ -1,16 +1,16 @@
-# Documento de requisitos do AVA (sofre alterações conforme o projeto avança)
+# Documento de requisitos do Presence (sofre alterações conforme o projeto avança)
 
 ## Requisitos Funcionais
 
-- ✅ **RF01:** O sistema deve permitir que um aluno ou professor façam login. O aluno pode se autocadastrar, enquanto o professor precisa pedir o cadastro ao responsável pelo ambiente. *(Implementado — cadastro.py, login.py, gateway)*
+- ✅ **RF01:** O sistema deve permitir que um aluno ou professor façam login. O aluno pode se autocadastrar, enquanto o professor precisa pedir o cadastro ao responsável pelo ambiente. *(Implementado - cadastro.py, login.py, gateway)*
 
-- ✅ **RF02:** O sistema deve permitir que o aluno se cadastre e entre com sua senha sempre que quiser *(Implementado — cadastro.py, login.py)*
+- ✅ **RF02:** O sistema deve permitir que o aluno se cadastre e entre com sua senha sempre que quiser *(Implementado - cadastro.py, login.py)*
 
-- ✅ **RF03:** O sistema deve permitir que o professor publique notas e o aluno veja as mesmas *(Implementado — notas.py, gateway, dashboard.html)*
+- ✅ **RF03:** O sistema deve permitir que o professor publique notas e o aluno veja as mesmas *(Implementado - notas.py, gateway, dashboard.html)*
 
-- ✅ **RF04:** O sistema deve permitir que o professor abra turmas e os alunos possam se cadastrar nelas *(Implementado — turma.py, gateway)*
+- ✅ **RF04:** O sistema deve permitir que o professor abra turmas e os alunos possam se cadastrar nelas *(Implementado - turma.py, gateway)*
 
-- ✅ **RF05:** O sistema deve permitir a criação de sessões (ou aulas) dentro de cada turma, onde em cada aula os alunos tenham acesso aos materiais e instruções postas pelo professor em tempo real *(Implementado — criação de aulas, página da aula com assunto, timer e presença)*
+- ✅ **RF05:** O sistema deve permitir a criação de sessões (ou aulas) dentro de cada turma, onde em cada aula os alunos tenham acesso aos materiais e instruções postas pelo professor em tempo real *(Implementado - criação de aulas, página da aula com assunto, timer e presença)*
 
 - ✅ **RF06:** O aluno deve ser capaz de visualizar suas notas em um ambiente apropriado *(Implementado — dashboard.html, página "Minhas Notas" com notas agrupadas por turma e média ponderada)*
 

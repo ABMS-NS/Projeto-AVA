@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - AVA</title>
+    <title>Dashboard - Presence</title>
     <link rel="stylesheet" href="/static/styles.css">
     <style>
         body {
@@ -325,7 +325,7 @@
 <body>
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-logo">AVA</div>
+        <div class="sidebar-logo">Presence</div>
 
         <!-- Menu Alunos -->
         <ul class="sidebar-menu" id="menu-aluno" style="display: none;">
@@ -359,11 +359,12 @@
         <div class="content-area">
             <!-- PÁGINAS ALUNO -->
             <div class="page ativo" id="inicio-aluno">
-                <h2>Bem-vindo ao AVA!</h2>
+                <h2>Bem-vindo ao Presence!</h2>
                 <div class="grid">
                     <div class=card>
                         <h2>Olá!</h2>
                     </div>
+                    <div id="recomendacao"></div>
                 </div>
             </div>
 
@@ -506,6 +507,51 @@
 
                 // Busca turmas ao carregar a página
                 document.addEventListener('DOMContentLoaded', fetchTurmas);
+
+                function carregarRecomendacao() {
+                    const usuario = JSON.parse(localStorage.getItem('usuario'));
+                    if (!usuario || usuario.tipo !== 'aluno') return;
+
+                    fetch('http://localhost:5000/api/notas/aluno?email=' + encodeURIComponent(usuario.email))
+                        .then(r => r.json())
+                        .then(data => {
+                            const container = document.getElementById('recomendacao');
+                            if (!container) return;
+                            container.innerHTML = '';
+
+                            const turmasBaixas = [];
+
+                            data.forEach(turma => {
+                                if (!turma.notas || turma.notas.length === 0) return;
+                                let soma = 0, pesos = 0;
+                                turma.notas.forEach(n => {
+                                    soma += n.nota * n.peso;
+                                    pesos += n.peso;
+                                });
+                                const media = pesos > 0 ? soma / pesos : 0;
+                                if (media < 6) {
+                                    turmasBaixas.push({ nome: turma.nome_turma, media });
+                                }
+                            });
+
+                            if (turmasBaixas.length === 0) return;
+
+                            let html = '<div class="card" style="border-left: 4px solid #e74c3c;">';
+                            html += '<h2>Reforço Recomendado</h2>';
+                            html += '<p>Suas notas estão baixas nas seguintes turmas:</p><ul>';
+                            turmasBaixas.forEach(t => {
+                                html += '<li><strong>' + t.nome + '</strong> - média ' + t.media.toFixed(1) + '</li>';
+                            });
+                            html += '</ul>';
+                            html += '<p style="margin-top:8px;color:#666;">Procure o professor para reforço!</p>';
+                            html += '</div>';
+
+                            container.innerHTML = html;
+                        })
+                        .catch(() => {});
+                }
+
+                document.addEventListener('DOMContentLoaded', carregarRecomendacao);
             </script> <!--
 
 
@@ -727,7 +773,7 @@
                                             <strong style="color:#333;">${nomeTurma}</strong>
                                             <div style="font-size:0.9em;color:#666;margin-top:4px;">
                                                 ${data} às ${inicio}
-                                                ${freq.assunto ? ' — ' + freq.assunto : ''}
+                                                ${freq.assunto ? ' - ' + freq.assunto : ''}
                                             </div>
                                         </div>
                                         <div style="text-align:right;">
